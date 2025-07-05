@@ -5,6 +5,8 @@ import { supabase } from '@/supabaseClient';
 import PhotoUploadForm from '@/components/PhotoUploadForm';
 import { MdAddAPhoto, MdCancel, MdDelete } from 'react-icons/md';
 import Image from 'next/image';
+import type { Post } from '@/types/Post';
+import type { Photo } from '@/types/Photo';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
