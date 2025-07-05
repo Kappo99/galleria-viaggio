@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📸 Galleria di Viaggio – Esercizio Tecnico
 
-## Getting Started
+Questo repository contiene il codice sorgente per una web app di tipo "galleria fotografica personale", sviluppata come esercizio tecnico.
 
-First, run the development server:
+## 🎯 Obiettivo dell'app
+
+Realizzare una web app chiamata **"Galleria di viaggio"** in cui un utente può caricare e visualizzare le proprie foto di viaggio con alcune informazioni aggiuntive.  
+L’obiettivo è simulare un’app personale dove un utente può documentare i propri ricordi fotografici e rivederli nel tempo.
+
+L'app deve essere sviluppata utilizzando **Next.js**.
+
+---
+
+## ✅ Requisiti minimi
+
+- Form per caricare un’immagine, con i seguenti campi:
+  - Titolo
+  - Tag testuale
+  - Note descrittive
+  - (Facoltativi) Altri campi ritenuti utili
+
+- Le immagini caricate devono essere visibili in una griglia
+- Utilizzo di un database relazionale con ORM a scelta
+- Si consiglia l'utilizzo di **Supabase** come backend-as-a-service per:
+  - Database
+  - Storage
+  - Autenticazione (opzionale)
+
+---
+
+## 📦 Output richiesto
+
+- Repository Git contenente il codice completo
+- Deploy online (es. su Vercel) se possibile
+- In alternativa, istruzioni dettagliate per avviare in locale
+
+---
+
+## ✨ Nice to have (opzionali ma apprezzati)
+
+- Autenticazione tramite Supabase
+- Campo Tag con selezione multipla
+- Supporto al caricamento multiplo delle immagini nello stesso form
+
+---
+
+## 🛠 Stack consigliato
+
+- **Frontend:** [Next.js](https://nextjs.org/)
+- **Backend-as-a-Service:** [Supabase](https://supabase.com/)
+- **Stilizzazione:** Tailwind CSS o altra UI library a scelta
+- **ORM (se non si usa Supabase direttamente):** Prisma, Drizzle, ecc.
+
+---
+
+## 🚀 Come iniziare
 
 ```bash
+git clone https://github.com/Kappo99/galleria-viaggio.git
+cd galleria-viaggio
+npm install
+cp .env.local.example .env.local  # Inserisci le credenziali Supabase
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📝 Licenza
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Questo progetto è destinato esclusivamente a scopo di valutazione tecnica.
