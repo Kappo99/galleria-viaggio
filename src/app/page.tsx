@@ -72,13 +72,13 @@ export default function Home() {
                 <span key={tag} className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">{tag}</span>
               ))}
             </div>
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="grid grid-cols-2 gap-2 mt-4">
               {post.photos.map((photo: any) => (
                 <img
                   key={photo.id}
                   src={photo.signedUrl}
                   alt={post.title}
-                  className="w-24 h-24 object-cover rounded"
+                  className="w-full h-auto object-cover rounded aspect-square"
                 />
               ))}
             </div>
