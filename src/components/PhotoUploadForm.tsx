@@ -7,7 +7,7 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -25,44 +25,61 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return;
+    if (!files.length) return;
     setLoading(true);
 
-    // Upload file to Supabase Storage
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const storagePath = userId ? `user/${userId}/${fileName}` : fileName;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('photos')
-      .upload(storagePath, file);
+    // 1. Crea il record post
+    const { data: postData, error: postError } = await supabase
+      .from('posts')
+      .insert([
+        {
+          user_id: userId,
+          title,
+          notes,
+          tags,
+        },
+      ])
+      .select()
+      .single();
 
-    if (uploadError) {
-      alert('Errore upload immagine');
+    if (postError || !postData) {
+      alert('Errore creazione post');
       setLoading(false);
       return;
     }
 
-    // Salva solo storagePath, NON la publicUrl
-    const { error: dbError } = await supabase.from('photos').insert([
-      {
-        user_id: userId,
-        title,
-        notes,
-        tags,
-        image_url: storagePath,
-      },
-    ]);
+    // 2. Carica tutte le immagini e crea i record photos
+    for (const file of files) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+      const storagePath = userId ? `user/${userId}/${fileName}` : fileName;
+      const { error: uploadError } = await supabase.storage
+        .from('photos')
+        .upload(storagePath, file);
 
-    if (dbError) {
-      alert('Errore salvataggio dati');
-    } else {
-      setTitle('');
-      setNotes('');
-      setTags([]);
-      setFile(null);
-      onUploaded();
+      if (uploadError) {
+        alert('Errore upload immagine: ' + file.name);
+        continue;
+      }
+
+      const { error: dbError } = await supabase.from('photos').insert([
+        {
+          post_id: postData.id,
+          image_url: storagePath,
+        },
+      ]);
+
+      if (dbError) {
+        alert('Errore salvataggio dati per: ' + file.name);
+      }
     }
+
+    setTitle('');
+    setNotes('');
+    setTags([]);
+    setFiles([]);
     setLoading(false);
+    onUploaded();
   };
 
   return (
@@ -78,7 +95,8 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
       <input
         type="file"
         accept="image/*"
-        onChange={e => setFile(e.target.files?.[0] || null)}
+        multiple
+        onChange={e => setFiles(Array.from(e.target.files || []))}
         required
         className="border p-2 rounded"
       />
