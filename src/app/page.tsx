@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/supabaseClient';
 import PhotoUploadForm from '@/components/PhotoUploadForm';
 import { MdAddAPhoto, MdCancel, MdDelete } from 'react-icons/md';
+import Image from 'next/image';
 
 export default function Home() {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [showForm, setShowForm] = useState(false);
 
   const fetchPostsWithPhotos = async () => {
@@ -23,7 +24,7 @@ export default function Home() {
     const postsWithSignedPhotos = await Promise.all(
       (data || []).map(async (post) => {
         const photos = await Promise.all(
-          (post.photos || []).map(async (photo: any) => {
+          (post.photos || []).map(async (photo: Photo) => {
             const { data: signedUrlData } = await supabase.storage
               .from('photos')
               .createSignedUrl(photo.image_url, 60 * 60);
@@ -47,11 +48,11 @@ export default function Home() {
     fetchPostsWithPhotos();
   }, []);
 
-  const handleDeletePost = async (post: any) => {
+  const handleDeletePost = async (post: Post) => {
     if (!window.confirm("Sei sicuro di voler eliminare questo post e tutte le sue foto?")) return;
 
     // 1. Elimina tutte le immagini dallo storage
-    const imagePaths = post.photos.map((photo: any) => photo.image_url);
+    const imagePaths = post.photos.map((photo: Photo) => photo.image_url);
     console.log("Paths delle immagini da eliminare:", imagePaths);
     if (imagePaths.length > 0) {
       const { error: storageError } = await supabase.storage
@@ -119,12 +120,15 @@ export default function Home() {
               ))}
             </div>
             <div className="grid grid-cols-2 gap-2 mt-4">
-              {post.photos.map((photo: any) => (
-                <img
+              {post.photos.map((photo: Photo) => (
+                <Image
                   key={photo.id}
-                  src={photo.signedUrl}
+                  src={photo.signedUrl ?? ''}
                   alt={post.title}
+                  width={300}
+                  height={300}
                   className="w-full h-auto object-cover rounded aspect-square"
+                  unoptimized
                 />
               ))}
             </div>
