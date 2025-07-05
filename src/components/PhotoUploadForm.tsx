@@ -95,7 +95,7 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
         onChange={handleTagChange}
         className="border p-2 rounded"
       />
-      <button type="submit" disabled={loading || !userId} className="bg-blue-600 text-white p-2 rounded">
+      <button type="submit" disabled={loading || !userId} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded cursor-pointer">
         {loading ? 'Caricamento...' : 'Carica'}
       </button>
     </form>

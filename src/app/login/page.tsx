@@ -30,6 +30,16 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin, // oppure una pagina specifica dopo il login
+      },
+    });
+    if (error) alert(error.message);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
@@ -51,15 +61,23 @@ export default function LoginPage() {
           required
         />
         {error && <div className="text-red-500">{error}</div>}
-        <button type="submit" className="bg-blue-600 text-white p-2 rounded">
+        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded cursor-pointer">
           {isLogin ? 'Login' : 'Registrati'}
         </button>
         <button
           type="button"
-          className="text-blue-600 underline"
+          className="text-blue-600 hover:text-blue-700 underline cursor-pointer"
           onClick={() => setIsLogin(!isLogin)}
         >
           {isLogin ? 'Non hai un account? Registrati' : 'Hai già un account? Login'}
+        </button>
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="bg-white hover:bg-slate-200 text-dark border-dark p-2 rounded-full mt-2 cursor-pointer flex items-center justify-center gap-6"
+        >
+          <img src="/google.png" alt="Google" className="w-6 h-6" />
+          Accedi con Google
         </button>
       </form>
     </div>
