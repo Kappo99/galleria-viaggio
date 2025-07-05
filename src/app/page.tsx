@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/supabaseClient';
 import PhotoUploadForm from '@/components/PhotoUploadForm';
-import { MdAddAPhoto, MdCancel } from 'react-icons/md';
+import { MdAddAPhoto, MdCancel, MdDelete } from 'react-icons/md';
 
 export default function Home() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -47,6 +47,46 @@ export default function Home() {
     fetchPostsWithPhotos();
   }, []);
 
+  const handleDeletePost = async (post: any) => {
+    if (!window.confirm("Sei sicuro di voler eliminare questo post e tutte le sue foto?")) return;
+
+    // 1. Elimina tutte le immagini dallo storage
+    const imagePaths = post.photos.map((photo: any) => photo.image_url);
+    console.log("Paths delle immagini da eliminare:", imagePaths);
+    if (imagePaths.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from('photos')
+        .remove(imagePaths);
+      if (storageError) {
+        alert("Errore durante l'eliminazione delle immagini dallo storage.");
+        return;
+      }
+    }
+
+    // 2. Elimina le foto dal database
+    const { error: photosError } = await supabase
+      .from('photos')
+      .delete()
+      .eq('post_id', post.id);
+    if (photosError) {
+      alert("Errore durante l'eliminazione delle foto dal database.");
+      return;
+    }
+
+    // 3. Elimina il post dal database
+    const { error: postError } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', post.id);
+    if (postError) {
+      alert("Errore durante l'eliminazione del post.");
+      return;
+    }
+
+    // 4. Aggiorna la lista dei post
+    fetchPostsWithPhotos();
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-center mb-6">Galleria di viaggio</h1>
@@ -64,7 +104,13 @@ export default function Home() {
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6 mb-8">
         {posts.map((post) => (
-          <div key={post.id} className="p-4 border rounded bg-white shadow">
+          <div key={post.id} className="relative p-4 border rounded bg-white shadow">
+            <button
+              className="absolute top-2 right-2 bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded text-xs mb-2 cursor-pointer"
+              onClick={() => handleDeletePost(post)}
+            >
+              <MdDelete className='text-lg' />
+            </button>
             <h2 className="text-xl font-bold text-dark">{post.title}</h2>
             <p className="text-gray-600">{post.notes}</p>
             <div className="flex flex-wrap gap-2 mt-2">
