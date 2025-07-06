@@ -74,8 +74,8 @@ Al fine di gestire correttamente i post e le relative foto ho dovuto modificare 
 - `photos`: id, post_id, image_url, created_at
 
 Una volta fatto ciò, nel frontend Next.js avevo 2 opzioni differenti per reperire tutti i dati dei post e delle photos:
-a. scrivere 2 Query JS differenti per reperire sia i post sia le photos, poi unire i dati tramite frontend js (soluzione semplice, ma poco robusta)
-b. creare una view tramite SQL con un filtro sull'auth.uuid, in modo che vengano mostrati solo i dati dell'utente che ha effettuato il login (soluzione più complessa, ma robusta)
+- scrivere 2 Query JS differenti per reperire sia i post sia le photos, poi unire i dati tramite frontend js (soluzione semplice, ma poco robusta)
+- creare una view tramite SQL con un filtro sull'auth.uuid, in modo che vengano mostrati solo i dati dell'utente che ha effettuato il login (soluzione più complessa, ma robusta)
 Io ho optato per la seconda opzione, quella della view SQL.
 
 ### Supabase
