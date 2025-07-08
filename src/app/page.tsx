@@ -7,15 +7,15 @@ import { MdAddAPhoto, MdCancel, MdDelete } from 'react-icons/md';
 import Image from 'next/image';
 import type { Post } from '@/types/Post';
 import type { Photo } from '@/types/Photo';
-import useConfirm from '@/components/useConfirm';
+import { useGlobalConfirm } from "@/components/ConfirmProvider";
 import { useGlobalToast } from '@/components/ToastProvider';
 import { MessageType } from '@/types';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [confirm, ConfirmDialog] = useConfirm();
   
+  const confirm = useGlobalConfirm();
   const showToast = useGlobalToast();
 
   const fetchPostsWithPhotos = async () => {
@@ -143,7 +143,6 @@ export default function Home() {
           </div>
         ))}
       </div>
-      {ConfirmDialog}
     </div>
   );
 }

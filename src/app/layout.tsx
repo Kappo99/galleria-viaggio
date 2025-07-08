@@ -4,6 +4,7 @@ import "./globals.css";
 import LogoutButton from "@/components/LogoutButton";
 import AuthGuard from "@/components/AuthGuard";
 import { ToastProvider } from "@/components/ToastProvider";
+import { ConfirmProvider } from "@/components/ConfirmProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +33,11 @@ export default function RootLayout({
       >
         <LogoutButton />
         <ToastProvider>
-          <AuthGuard>
-            {children}
-          </AuthGuard>
+          <ConfirmProvider>
+            <AuthGuard>
+              {children}
+            </AuthGuard>
+          </ConfirmProvider>
         </ToastProvider>
       </body>
     </html>
