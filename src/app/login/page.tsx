@@ -4,32 +4,30 @@ import { useState } from 'react';
 import { supabase } from '@/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import useToast from '@/components/useToast';
 import { MessageType } from '@/types';
+import { useGlobalToast } from "@/components/ToastProvider";
 
 export default function LoginPage() {
-  const [showToast, Toast] = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState('');
   const router = useRouter();
+  
+  const showToast = useGlobalToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     if (isLogin) {
       // Login
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      // if (error) setError(error.message);
       if (error) showToast(error.message, MessageType.ERROR);
       else router.push('/');
     } else {
       // Registrazione
       const { error } = await supabase.auth.signUp({ email, password });
-      if (error) setError(error.message);
+      if (error) showToast(error.message, MessageType.ERROR);
       else {
-        alert('Registrazione avvenuta! Controlla la tua email per confermare.');
+        showToast('Registrazione avvenuta! Controlla la tua email per confermare', MessageType.INFO);
         setIsLogin(true);
       }
     }
@@ -42,12 +40,11 @@ export default function LoginPage() {
         redirectTo: window.location.origin, // oppure una pagina specifica dopo il login
       },
     });
-    if (error) alert(error.message);
+    if (error) showToast(error.message, MessageType.ERROR);
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      {Toast}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
         <h2 className="text-2xl font-bold mb-4">{isLogin ? 'Login' : 'Registrati'}</h2>
         <input
@@ -66,7 +63,6 @@ export default function LoginPage() {
           onChange={e => setPassword(e.target.value)}
           required
         />
-        {error && <div className="text-red-500">{error}</div>}
         <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded cursor-pointer">
           {isLogin ? 'Login' : 'Registrati'}
         </button>

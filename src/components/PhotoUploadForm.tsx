@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/supabaseClient';
+import { useGlobalToast } from './ToastProvider';
+import { MessageType } from '@/types';
 
 export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void }) {
   const [title, setTitle] = useState('');
@@ -10,6 +12,8 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  
+  const showToast = useGlobalToast();
 
   useEffect(() => {
     const getUser = async () => {
@@ -43,7 +47,7 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
       .single();
 
     if (postError || !postData) {
-      alert('Errore creazione post');
+      showToast('Errore creazione post', MessageType.ERROR);
       setLoading(false);
       return;
     }
@@ -58,7 +62,7 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
         .upload(storagePath, file);
 
       if (uploadError) {
-        alert('Errore upload immagine: ' + file.name);
+        showToast('Errore upload immagine: ' + file.name, MessageType.ERROR);
         continue;
       }
 
@@ -70,7 +74,7 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
       ]);
 
       if (dbError) {
-        alert('Errore salvataggio dati per: ' + file.name);
+        showToast('Errore salvataggio dati per: ' + file.name, MessageType.ERROR);
       }
     }
 

@@ -8,11 +8,15 @@ import Image from 'next/image';
 import type { Post } from '@/types/Post';
 import type { Photo } from '@/types/Photo';
 import useConfirm from '@/components/useConfirm';
+import { useGlobalToast } from '@/components/ToastProvider';
+import { MessageType } from '@/types';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [confirm, ConfirmDialog] = useConfirm();
+  
+  const showToast = useGlobalToast();
 
   const fetchPostsWithPhotos = async () => {
     const { data, error } = await supabase
@@ -63,7 +67,7 @@ export default function Home() {
         .from('photos')
         .remove(imagePaths);
       if (storageError) {
-        alert("Errore durante l'eliminazione delle immagini dallo storage.");
+        showToast("Errore durante l'eliminazione delle immagini dallo storage", MessageType.ERROR);
         return;
       }
     }
@@ -74,7 +78,7 @@ export default function Home() {
       .delete()
       .eq('post_id', post.id);
     if (photosError) {
-      alert("Errore durante l'eliminazione delle foto dal database.");
+      showToast("Errore durante l'eliminazione delle foto dal database", MessageType.ERROR);
       return;
     }
 
@@ -84,7 +88,7 @@ export default function Home() {
       .delete()
       .eq('id', post.id);
     if (postError) {
-      alert("Errore durante l'eliminazione del post.");
+      showToast("Errore durante l'eliminazione del post", MessageType.ERROR);
       return;
     }
 
