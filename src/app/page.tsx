@@ -7,10 +7,12 @@ import { MdAddAPhoto, MdCancel, MdDelete } from 'react-icons/md';
 import Image from 'next/image';
 import type { Post } from '@/types/Post';
 import type { Photo } from '@/types/Photo';
+import useConfirm from '@/components/useConfirm';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [confirm, ConfirmDialog] = useConfirm();
 
   const fetchPostsWithPhotos = async () => {
     const { data, error } = await supabase
@@ -51,11 +53,11 @@ export default function Home() {
   }, []);
 
   const handleDeletePost = async (post: Post) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo post e tutte le sue foto?")) return;
+    const ok = await confirm("Sei sicuro di voler eliminare questo post e tutte le sue foto?");
+    if (!ok) return;
 
     // 1. Elimina tutte le immagini dallo storage
     const imagePaths = post.photos.map((photo: Photo) => photo.image_url);
-    console.log("Paths delle immagini da eliminare:", imagePaths);
     if (imagePaths.length > 0) {
       const { error: storageError } = await supabase.storage
         .from('photos')
@@ -137,6 +139,7 @@ export default function Home() {
           </div>
         ))}
       </div>
+      {ConfirmDialog}
     </div>
   );
 }
