@@ -93,3 +93,16 @@ Avendo utilizzato Next.js con TypeScript, si ha un controllo sui tipi dei dati. 
 
 Per quanto riguarda la sessione utente, ho previsto una pagina di login/registrazione che permette di fare l'accesso tramite email e password, oppure tramite Google.
 Per garantire che le varie pagine della Web App siano accessibili solo dopo aver effettuato il login, ho creato un componente `AuthGuard` che funge da container per tutte le pagine esistenti. All'interno di questo componente verifico che ci sia una sessione di supabase attiva (a meno che mi trovo nella pagina di login), e in caso negativo forzo il redirect alla pagina di login/registrazione.
+
+---
+
+### Implementazioni aggiuntive
+Al fine di ottimizzare ulteriormente l'applicazione, ho deciso di rimuovere gli `alert` e `window.confirm` che avevo inserito inizialmente per semplicità.
+
+A tal proposito ho creato 2 providers:
+- `ToastProvider`: usato per gli `alert`, collegato al componente `useToast`
+- `ConfirmProvider`: usato per i `window.confirm`, collegato al componente `useConfirm`
+
+I provider permettono di avere i componenti `toast` e `confirm` renderizzati solo 1 volta (nel provider) e poterli utilizzare in tutti i componenti e pagine che li necessitano (senza doverli inserire manualmente in ogni rendering di componente). Questo permette di avere una soluzione robusta e scalabile.
+
+L'utilizzo di questi componenti al posto dei classici `alert` e `window.confirm` permette di avere una UX migliore.
