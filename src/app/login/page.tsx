@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { supabase } from '@/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import useToast from '@/components/useToast';
+import { MessageType } from '@/types';
 
 export default function LoginPage() {
+  const [showToast, Toast] = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -18,7 +21,8 @@ export default function LoginPage() {
     if (isLogin) {
       // Login
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setError(error.message);
+      // if (error) setError(error.message);
+      if (error) showToast(error.message, MessageType.ERROR);
       else router.push('/');
     } else {
       // Registrazione
@@ -43,6 +47,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
+      {Toast}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
         <h2 className="text-2xl font-bold mb-4">{isLogin ? 'Login' : 'Registrati'}</h2>
         <input
