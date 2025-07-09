@@ -4,13 +4,10 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/supabaseClient';
 import { useGlobalToast } from './ToastProvider';
 import { MessageType } from '@/types';
+import { useForm } from "react-hook-form";
 
 export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void }) {
-  const [title, setTitle] = useState('');
-  const [notes, setNotes] = useState('');
-  const [tagsInput, setTagsInput] = useState('');
-  const [files, setFiles] = useState<File[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm();
   const [userId, setUserId] = useState<string | null>(null);
   
   const showToast = useGlobalToast();
@@ -23,15 +20,17 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
     getUser();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!files.length) return;
-    setLoading(true);
-
-    const tags = tagsInput
+  const onSubmit = async (data: any) => {
+    // Gestione files
+    const files = Array.from(data.files as FileList);
+    if (!files.length) {
+      return;
+    }
+    // Gestione tags
+    const tags = (data.tags || '')
       .split(',')
-      .map(t => t.trim())
-      .filter(t => t.length > 0);
+      .map((t: string) => t.trim())
+      .filter((t: string) => t.length > 0);
 
     // 1. Crea il record post
     const { data: postData, error: postError } = await supabase
@@ -39,8 +38,8 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
       .insert([
         {
           user_id: userId,
-          title,
-          notes,
+          title: data.title,
+          notes: data.notes,
           tags,
         },
       ])
@@ -49,7 +48,6 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
 
     if (postError || !postData) {
       showToast('Errore creazione post', MessageType.ERROR);
-      setLoading(false);
       return;
     }
 
@@ -79,47 +77,18 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
       }
     }
 
-    setTitle('');
-    setNotes('');
-    setTagsInput(''); // Reset the input field
-    setFiles([]);
-    setLoading(false);
+    reset();
     onUploaded();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-4 border rounded bg-white shadow text-dark">
-      <input
-        type="text"
-        placeholder="Titolo"
-        value={title}
-        onChange={e => setTitle(e.target.value)}
-        required
-        className="border p-2 rounded"
-      />
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={e => setFiles(Array.from(e.target.files || []))}
-        required
-        className="border p-2 rounded"
-      />
-      <textarea
-        placeholder="Note"
-        value={notes}
-        onChange={e => setNotes(e.target.value)}
-        className="border p-2 rounded"
-      />
-      <input
-        type="text"
-        placeholder="Tag (separati da virgola)"
-        value={tagsInput}
-        onChange={e => setTagsInput(e.target.value)}
-        className="border p-2 rounded"
-      />
-      <button type="submit" disabled={loading || !userId} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded cursor-pointer">
-        {loading ? 'Caricamento...' : 'Carica'}
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 p-4 border rounded bg-white shadow text-dark">
+      <input {...register("title", { required: true })} placeholder="Titolo" className="border p-2 rounded" />
+      <input {...register("files", { required: true })} type="file" multiple className="border p-2 rounded" />
+      <textarea {...register("notes")} placeholder="Note" className="border p-2 rounded" />
+      <input {...register("tags")} placeholder="Tag (separati da virgola)" className="border p-2 rounded" />
+      <button type="submit" disabled={isSubmitting || !userId} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded cursor-pointer">
+        {isSubmitting ? 'Caricamento...' : 'Carica'}
       </button>
     </form>
   );
