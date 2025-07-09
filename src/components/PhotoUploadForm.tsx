@@ -5,9 +5,10 @@ import { supabase } from '@/supabaseClient';
 import { useGlobalToast } from './ToastProvider';
 import { MessageType } from '@/types';
 import { useForm } from "react-hook-form";
+import type { PhotoUploadFormData } from '@/types/Photo';
 
 export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void }) {
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm();
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<PhotoUploadFormData>();
   const [userId, setUserId] = useState<string | null>(null);
   
   const showToast = useGlobalToast();
@@ -20,7 +21,7 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
     getUser();
   }, []);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: PhotoUploadFormData) => {
     // Gestione files
     const files = Array.from(data.files as FileList);
     if (!files.length) {
