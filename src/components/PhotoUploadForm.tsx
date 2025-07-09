@@ -8,7 +8,7 @@ import { MessageType } from '@/types';
 export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void }) {
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
+  const [tagsInput, setTagsInput] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -23,14 +23,15 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
     getUser();
   }, []);
 
-  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTags(e.target.value.split(',').map(t => t.trim()));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!files.length) return;
     setLoading(true);
+
+    const tags = tagsInput
+      .split(',')
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
 
     // 1. Crea il record post
     const { data: postData, error: postError } = await supabase
@@ -80,7 +81,7 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
 
     setTitle('');
     setNotes('');
-    setTags([]);
+    setTagsInput(''); // Reset the input field
     setFiles([]);
     setLoading(false);
     onUploaded();
@@ -113,8 +114,8 @@ export default function PhotoUploadForm({ onUploaded }: { onUploaded: () => void
       <input
         type="text"
         placeholder="Tag (separati da virgola)"
-        value={tags.join(', ')}
-        onChange={handleTagChange}
+        value={tagsInput}
+        onChange={e => setTagsInput(e.target.value)}
         className="border p-2 rounded"
       />
       <button type="submit" disabled={loading || !userId} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded cursor-pointer">
